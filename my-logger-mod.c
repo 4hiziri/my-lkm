@@ -86,7 +86,7 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t len, loff_t *o
   int error_count = copy_to_user(buffer, log, len);
 
   if (error_count == 0) {
-    printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
+    printk(KERN_INFO "%s: Send %lu characters.\n", CLASS_NAME, len);
     // TODO: shrink log, but how copy works?
     return len;
   } else {
