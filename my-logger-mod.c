@@ -101,7 +101,7 @@ static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, lo
 }
 
 static int dev_release(struct inode *inode_p, struct file *file_p) {
-  printk(KERN_INFO "%s: close\n");
+  printk(KERN_INFO "%s: close\n", CLASS_NAME);
   return 0;
 }
 
