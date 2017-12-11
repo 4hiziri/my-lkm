@@ -83,7 +83,7 @@ static int dev_open(struct inode *inode_p, struct file * file_p) {
 }
 
 static ssize_t dev_read(struct file *file_p, char *buffer, size_t len, loff_t *offset){
-  int error_count = copy_tu_user(buffer, log, len);
+  int error_count = copy_to_user(buffer, log, len);
 
   if (error_count == 0) {
     printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
