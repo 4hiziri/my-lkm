@@ -96,7 +96,7 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t len, loff_t *o
 }
 
 static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, loff_t *offset) {
-  printk(KERN_INFO "%s: Message is %s\n", buffer);
+  printk(KERN_INFO "%s: Message is %s\n", CLASS_NAME, buffer);
   return len;
 }
 
