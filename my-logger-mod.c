@@ -98,12 +98,15 @@ static int dev_open(struct inode *inode_p, struct file * file_p) {
   return 0;
 }
 
-static ssize_t dev_read(struct file *file_p, char *buffer, size_t len, loff_t *offset){
+static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t *offset){
+  int len = strlen(log);
   int error_count = copy_to_user(buffer, log, len);
 
   if (error_count == 0) {
     printk(KERN_INFO "%s: Send %lu characters.\n", CLASS_NAME, len);
-    // TODO: shrink log, but how copy works?
+    memset(log, 0, LOG_MAX);
+    log_p = log;
+    
     return len;
   } else {
     printk(KERN_INFO "%s: Failed Sent\n", CLASS_NAME);
