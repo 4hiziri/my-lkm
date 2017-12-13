@@ -20,9 +20,11 @@ int main(int argc, char** argv){
 
   while(count < 10) {
     ret = read(fd, receive, LOG_MAX);
-    if (ret >= 0) {
+    if (ret > 0) {
       printf("%s\n", receive);
       memset(receive, 0, LOG_MAX);
+    } else if (ret == 0){
+      continue;
     } else {
       perror("Failed to read\n");
       return errno;
