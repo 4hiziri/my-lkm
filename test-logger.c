@@ -21,7 +21,7 @@ int main(int argc, char** argv){
   while(count < 10) {
     ret = read(fd, receive, LOG_MAX);
     if (ret > 0) {
-      printf("%s\n", receive);
+      printf("%s", receive);
       memset(receive, 0, LOG_MAX);
     } else if (ret == 0){
       continue;
