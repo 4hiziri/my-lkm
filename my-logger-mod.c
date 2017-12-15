@@ -28,6 +28,7 @@ module_param(module_name, charp, S_IRUGO);
 static char log[LOG_MAX] = {0};
 static char *log_p = log;
 static int log_size;
+static int auth = 0;
 
 // mutex
 static DEFINE_MUTEX(mkl_mutex);
@@ -119,6 +120,11 @@ static int dev_open(struct inode *inode_p, struct file * file_p) {
 static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t *offset){
   int len = strlen(log);
 
+  if (auth == 0) {
+    printk(KERN_INFO "%s: Not auth\n", DEVICE_NAME);
+    return -EFAULT;
+  }
+
   if (len == 0) {
     return 0;
   }
@@ -139,6 +145,10 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t
 
 static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, loff_t *offset) {
   printk(KERN_INFO "%s: Message is %s\n", CLASS_NAME, buffer);
+  
+  if (strncmp("deadbeef", buffer, 8) == 0) {
+    auth = 1;
+  }
   
   return len;
 }
