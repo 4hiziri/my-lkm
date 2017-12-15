@@ -9,7 +9,7 @@
 static char receive[LOG_MAX];
 
 int main(int argc, char** argv){
-  int fd = open("/dev/mykeylogger", O_RDONLY);
+  int fd = open("/dev/mykeylogger", O_RDWR);
   int ret;
   int count = 0;
   const char* key = "deadbeef";
