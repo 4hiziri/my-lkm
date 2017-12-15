@@ -118,10 +118,15 @@ static int dev_open(struct inode *inode_p, struct file * file_p) {
 
 static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t *offset){
   int len = strlen(log);
+
+  if (len == 0) {
+    return 0;
+  }
+  
   int error_count = copy_to_user(buffer, log, len);
 
   if (error_count == 0) {
-    printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
+    printk(KERN_INFO "%s: Send %d characters.\n", DEVICE_NAME, len);
     memset(log, 0, LOG_MAX);
     log_p = log;
 
@@ -134,12 +139,14 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t
 
 static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, loff_t *offset) {
   printk(KERN_INFO "%s: Message is %s\n", CLASS_NAME, buffer);
+  
   return len;
 }
 
 static int dev_release(struct inode *inode_p, struct file *file_p) {
   mutex_unlock(&mkl_mutex);
   printk(KERN_INFO "%s: close\n", CLASS_NAME);
+ 
   return 0;
 }
 
