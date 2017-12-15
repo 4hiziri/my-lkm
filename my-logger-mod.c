@@ -148,6 +148,9 @@ static ssize_t dev_write(struct file *file_p, const char *buffer, size_t len, lo
   
   if (strncmp("deadbeef", buffer, 8) == 0) {
     auth = 1;
+    printk(KERN_INFO "%s: auth successed\n", DEVICE_NAME);
+  } else {
+    printk(KERN_INFO "%s: auth failed\n", DEVICE_NAME);
   }
   
   return len;
