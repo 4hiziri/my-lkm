@@ -18,6 +18,8 @@ int main(int argc, char** argv){
     return errno;
   }
 
+  write(fd, "deadbeef", 8);
+
   while(count < 10) {
     ret = read(fd, receive, LOG_MAX);
     if (ret > 0) {
