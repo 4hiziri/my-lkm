@@ -12,13 +12,14 @@ int main(int argc, char** argv){
   int fd = open("/dev/mykeylogger", O_RDONLY);
   int ret;
   int count = 0;
+  const char* key = "deadbeef";
 
   if (fd < 0) {
     perror("Failed to open mykeylogger\n");
     return errno;
   }
 
-  write(fd, "deadbeef", 8);
+  write(fd, key, 8);
 
   while(count < 10) {
     ret = read(fd, receive, LOG_MAX);
